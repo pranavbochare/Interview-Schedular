@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 230 33% 98%;
+    --foreground: 232 40% 12%;
+    --card: 0 0% 100%;
+    --border: 228 25% 90%;
+    --muted: 228 30% 96%;
+    --muted-foreground: 230 12% 45%;
+    --primary: 245 75% 58%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 245 90% 96%;
+    --accent-foreground: 245 70% 45%;
+  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+}
+
+/* FullCalendar theme to match blue/purple palette */
+.fc { --fc-border-color: hsl(228 25% 90%); --fc-button-bg-color: hsl(245 75% 58%); --fc-button-border-color: hsl(245 75% 58%);
+  --fc-button-hover-bg-color: hsl(245 70% 50%); --fc-button-hover-border-color: hsl(245 70% 50%);
+  --fc-button-active-bg-color: hsl(245 70% 45%); --fc-button-active-border-color: hsl(245 70% 45%);
+  --fc-today-bg-color: hsl(245 90% 97%); --fc-event-border-color: transparent; font-size: 0.85rem; }
+.fc .fc-toolbar-title { font-size: 1.05rem; font-weight: 600; }
+.fc .fc-button { text-transform: capitalize; font-size: 0.8rem; padding: 0.35rem 0.7rem; border-radius: 0.5rem; }
+.fc .fc-event { cursor: pointer; border-radius: 6px; padding: 1px 4px; }

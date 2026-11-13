@@ -1,0 +1,148 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  INTERVIEWER
+  ADMIN
+}
+
+// Where a student stands on their Track Badge
+enum BadgeStatus {
+  NOT_ELIGIBLE // still clearing skill contests
+  ELIGIBLE     // all skills cleared, interview pending
+  EARNED       // passed interview
+  NULLIFIED    // malpractice flagged, badge revoked
+}
+
+enum SlotStatus {
+  OPEN
+  BOOKED
+  CANCELLED
+}
+
+enum BookingStatus {
+  BOOKED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum OutcomeResult {
+  PASS
+  FAIL
+  RETAKE_LATER
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  student       StudentProfile?
+  slots         AvailabilitySlot[]
+  notifications Notification[]
+  outcomesGiven InterviewOutcome[]
+
+  @@index([role])
+}
+
+model StudentProfile {
+  id                   Int         @id @default(autoincrement())
+  userId               Int         @unique
+  rollNo               String      @unique
+  college              String
+  track                String
+  skillsRequired       Int         @default(5)
+  skillsCleared        Int         @default(0)
+  badgeStatus          BadgeStatus @default(NOT_ELIGIBLE)
+  malpracticeFlagged   Boolean     @default(false)
+  malpracticeNote      String?
+  malpracticeFlaggedAt DateTime?
+  retakeAfter          DateTime? // student cannot rebook before this date
+  createdAt            DateTime    @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([badgeStatus])
+}
+
+model AvailabilitySlot {
+  id            Int        @id @default(autoincrement())
+  interviewerId Int
+  startsAt      DateTime
+  endsAt        DateTime
+  status        SlotStatus @default(OPEN)
+  createdAt     DateTime   @default(now())
+
+  interviewer User      @relation(fields: [interviewerId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+
+  // an interviewer cannot have two slots starting at the same instant
+  @@unique([interviewerId, startsAt])
+  @@index([status, startsAt])
+}
+
+model Booking {
+  id          Int           @id @default(autoincrement())
+  slotId      Int
+  studentId   Int
+  status      BookingStatus @default(BOOKED)
+  rescheduledFromId Int?
+  cancelReason String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // MySQL has no partial unique indexes. These two columns hold a value only while
+  // the booking is active (BOOKED) and are NULL otherwise, so UNIQUE guarantees:
+  //   - a slot can never be double-booked
+  //   - a student can never hold two active bookings
+  activeSlotKey    Int? @unique
+  activeStudentKey Int? @unique
+
+  slot    AvailabilitySlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  student StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  outcome InterviewOutcome?
+
+  @@index([studentId])
+  @@index([slotId])
+}
+
+model InterviewOutcome {
+  id           Int           @id @default(autoincrement())
+  bookingId    Int           @unique
+  result       OutcomeResult
+  feedback     String?       @db.Text
+  retakeAfter  DateTime?
+  recordedById Int
+  createdAt    DateTime      @default(now())
+
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  recordedBy User    @relation(fields: [recordedById], references: [id])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  title     String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+}
