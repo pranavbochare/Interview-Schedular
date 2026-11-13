@@ -61,7 +61,7 @@ Seed data uses IST business hours (`SEED_TZ_OFFSET_MINUTES`, default 330). Serve
 
 ## API (all under `/api`, JWT bearer)
 
-`POST /auth/login`, `GET /auth/me` · Student: `GET /student/overview|slots`, `POST /student/bookings`, `PATCH /student/bookings/:id/reschedule`, `DELETE /student/bookings/:id` · Interviewer: `GET|POST /interviewer/slots`, `DELETE /interviewer/slots/:id`, `POST /interviewer/bookings/:id/outcome|no-show` · Admin: `/admin/stats|students|interviewers|results|schedule`, `POST|DELETE /admin/students/:id/malpractice`, `PATCH /admin/students/:id/skills`, `PATCH /admin/interviewers/:id/active` · `GET|POST /notifications`
+`POST /auth/login`, `GET /auth/me` · Student: `GET /student/overview|slots`, `POST /student/bookings`, `POST /student/bookings/:id/reschedule`, `DELETE /student/bookings/:id` · Interviewer: `GET|POST /interviewer/slots`, `DELETE /interviewer/slots/:id`, `POST /interviewer/bookings/:id/outcome|no-show` · Admin: `/admin/stats|students|interviewers|results|schedule`, `POST|DELETE /admin/students/:id/malpractice`, `PATCH /admin/students/:id/skills`, `PATCH /admin/interviewers/:id/active` · `GET|POST /notifications`
 
 ## Configuration (`server/.env`)
 

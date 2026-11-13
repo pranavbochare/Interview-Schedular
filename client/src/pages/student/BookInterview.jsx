@@ -43,7 +43,7 @@ export default function BookInterview() {
     setBusy(true);
     try {
       if (rescheduling) {
-        await api.patch(`/student/bookings/${booking.id}/reschedule`, { slotId: picked.id });
+        await api.post(`/student/bookings/${booking.id}/reschedule`, { slotId: picked.id });
         toast.success('Interview rescheduled', `Your new slot: ${fmtDateTime(picked.startsAt)} with ${picked.interviewer.name}.`);
       } else {
         await api.post('/student/bookings', { slotId: picked.id });

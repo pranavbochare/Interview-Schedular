@@ -90,7 +90,7 @@ router.post(
   }),
 );
 
-router.patch(
+router.post(
   '/bookings/:id/reschedule',
   wrap(async (req, res) => {
     const id = idParam.parse(req.params.id);

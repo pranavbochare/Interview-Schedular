@@ -10,8 +10,15 @@ import adminRoutes from './routes/admin.js';
 import notificationRoutes from './routes/notifications.js';
 
 const app = express();
-app.use(helmet());
-app.use(cors({ origin: config.clientOrigin }));
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } })); // API is called from the Vercel origin
+const corsOptions = {
+  origin: config.clientOrigin,
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 600,
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // answer every preflight explicitly
 app.use(express.json({ limit: '100kb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
