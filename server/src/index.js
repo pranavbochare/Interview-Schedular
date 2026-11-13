@@ -11,7 +11,12 @@ import notificationRoutes from './routes/notifications.js';
 
 const app = express();
 app.use(helmet());
-app.use(cors({ origin: config.clientOrigin }));
+app.use(cors({
+  origin: config.clientOrigin,
+  credentials: true,
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json({ limit: '100kb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
